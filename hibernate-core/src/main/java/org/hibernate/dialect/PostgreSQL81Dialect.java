@@ -18,6 +18,7 @@ import org.hibernate.JDBCException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.PessimisticLockException;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.PositionSubstringFunction;
@@ -455,6 +456,11 @@ public class PostgreSQL81Dialect extends Dialect {
 				if ( "55P03".equals( sqlState ) ) {
 					// LOCK NOT AVAILABLE
 					return new PessimisticLockException( message, sqlException, sql );
+				}
+
+				if ( "57014".equals( sqlState ) ) {
+					// QUERY CANCELED
+					return new QueryTimeoutException( message, sqlException, sql );
 				}
 
 				// returning null allows other delegates to operate
